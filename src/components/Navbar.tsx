@@ -9,7 +9,15 @@ const Navbar = () => {
         fontSize: "1.2rem",
       }}
     >
-      <div>Golrang System Project</div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        Golrang System
+      </div>
     </Header>
   );
 };

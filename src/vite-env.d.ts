@@ -6,3 +6,7 @@ type Post = {
   title: string;
   userId: number;
 };
+
+type ShowModalRef = {
+  showModal: (post?: Post) => void;
+};

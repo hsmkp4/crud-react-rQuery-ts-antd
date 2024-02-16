@@ -1,11 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Table } from "antd";
+import { useRef } from "react";
+import ManagePost from "./ManagePost";
 import { Content } from "antd/es/layout/layout";
+import { Button, Table } from "antd";
 import { deletePost, getPosts } from "../api";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteFilled, EditOutlined } from "@ant-design/icons";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const MainContent = () => {
+  const modalRef = useRef<ShowModalRef | null>(null);
   const queryClient = useQueryClient();
+
   const { data: posts, isLoading } = useQuery({
     queryKey: ["posts"],
     queryFn: getPosts,
@@ -37,9 +41,14 @@ const MainContent = () => {
       dataIndex: "actions",
       title: "Actions",
       render: (_: any, record: Post) => (
-        <Button onClick={() => onDelete.mutate(record.id)} color="red">
-          <DeleteOutlined />
-        </Button>
+        <>
+          <Button color="orange" onClick={() => showModal(record)}>
+            <EditOutlined style={{ color: "#666" }} />
+          </Button>
+          <Button onClick={() => onDelete.mutate(record.id)} color="red">
+            <DeleteFilled style={{ color: "#c34" }} />
+          </Button>
+        </>
       ),
     },
   ];
@@ -51,6 +60,10 @@ const MainContent = () => {
     },
   });
 
+  const showModal = (post?: Post) => {
+    modalRef.current?.showModal(post);
+  };
+
   return (
     <Content
       style={{
@@ -59,12 +72,21 @@ const MainContent = () => {
         overflowX: "hidden",
       }}
     >
+      <Button
+        type="primary"
+        onClick={() => showModal()}
+        style={{ marginBottom: "2rem" }}
+        block
+      >
+        Create New Post
+      </Button>
       <Table
         dataSource={posts}
         columns={headers}
         loading={isLoading}
         rowKey="id"
       />
+      <ManagePost ref={modalRef} />
     </Content>
   );
 };
