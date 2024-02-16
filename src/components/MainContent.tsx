@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import ManagePost from "./ManagePost";
 import { Content } from "antd/es/layout/layout";
-import { Button, Table } from "antd";
+import { Button, Form, Input, Table } from "antd";
 import { deletePost, getPosts, getUsers } from "../api";
 import { DeleteFilled, EditOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 const MainContent = () => {
   const modalRef = useRef<ShowModalRef | null>(null);
   const queryClient = useQueryClient();
+  const [searchedData, setSearchedData] = useState<Post[] | null>(null);
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ["posts"],
@@ -88,6 +89,12 @@ const MainContent = () => {
     modalRef.current?.showModal(post);
   };
 
+  const handleSearchFilter = (query: string) => {
+    const newData = posts?.filter(
+      (el) => el.title.includes(query) || el.body.includes(query)
+    );
+    setSearchedData(newData as Post[]);
+  };
   return (
     <Content
       style={{
@@ -104,8 +111,13 @@ const MainContent = () => {
       >
         Create New Post
       </Button>
+      <Input.Search
+        placeholder="Search on body or title"
+        style={{ marginBottom: "1rem" }}
+        onSearch={handleSearchFilter}
+      />
       <Table
-        dataSource={posts}
+        dataSource={searchedData ? searchedData : posts}
         columns={headers}
         loading={isLoading && userLoading}
         rowKey="id"
