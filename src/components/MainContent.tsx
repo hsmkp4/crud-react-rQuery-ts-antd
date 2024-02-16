@@ -55,8 +55,15 @@ const MainContent = () => {
 
   const onDelete = useMutation({
     mutationFn: (id: number) => deletePost(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    onError: (error) => {
+      console.log(error);
+    },
+
+    onSuccess: async (data: Post, variables: number) => {
+      queryClient.setQueryData(["posts"], (previous: Post[]) => {
+        const newData = previous.filter((el) => el.id !== variables);
+        return newData;
+      });
     },
   });
 

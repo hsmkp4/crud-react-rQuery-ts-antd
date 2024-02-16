@@ -24,18 +24,26 @@ function ManagePost(_: any, ref: Ref<ShowModalRef>) {
   useImperativeHandle(ref, () => ({ showModal }));
 
   const queryClient = useQueryClient();
+
   const createMutation = useMutation({
     mutationFn: createPost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    onSuccess: async (data: Post, variables: Omit<Post, "id">) => {
+      queryClient.setQueryData(["posts"], (previous: Post[]) => {
+        return [{ ...variables, id: crypto.randomUUID() }, ...previous];
+      });
       onClose();
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: updatePost,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    onSuccess: async (data: Post, variables: Post) => {
+      queryClient.setQueryData(["posts"], (previous: Post[]) => {
+        const newData = previous.map((el) =>
+          el.id === variables.id ? variables : el
+        );
+        return newData;
+      });
       onClose();
     },
   });
@@ -65,7 +73,7 @@ function ManagePost(_: any, ref: Ref<ShowModalRef>) {
   };
 
   return (
-    <Modal title={title} open={open} onCancel={onClose}>
+    <Modal title={title} open={open} onCancel={onClose} footer={null}>
       <Form
         form={form}
         onFinish={onFinish}
@@ -105,7 +113,7 @@ function ManagePost(_: any, ref: Ref<ShowModalRef>) {
         </Form.Item>
         <Form.Item>
           <Space />
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" block>
             Submit
           </Button>
         </Form.Item>
