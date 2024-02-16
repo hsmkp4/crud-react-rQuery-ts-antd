@@ -7,6 +7,13 @@ type Post = {
   userId: number;
 };
 
+type Users = {
+  id: number;
+  name: string;
+  username: string;
+  [key: string]: any;
+};
+
 type ShowModalRef = {
   showModal: (post?: Post) => void;
 };

@@ -18,3 +18,8 @@ export const deletePost = async (id: number) => {
   const res = await customAxios.delete<Post>(`/posts/${id}`);
   return res.data;
 };
+
+export const getUsers = async () => {
+  const res = await customAxios.get<Users[]>("/users");
+  return res.data;
+};

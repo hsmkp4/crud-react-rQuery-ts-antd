@@ -2,7 +2,7 @@ import { useRef } from "react";
 import ManagePost from "./ManagePost";
 import { Content } from "antd/es/layout/layout";
 import { Button, Table } from "antd";
-import { deletePost, getPosts } from "../api";
+import { deletePost, getPosts, getUsers } from "../api";
 import { DeleteFilled, EditOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -15,6 +15,17 @@ const MainContent = () => {
     queryFn: getPosts,
   });
 
+  const { data: users, isLoading: userLoading } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
+
+  const userFilterItem = () => {
+    return users?.map((el) => ({
+      text: el.username,
+      value: el.id,
+    }));
+  };
   const headers = [
     {
       key: "id",
@@ -34,7 +45,13 @@ const MainContent = () => {
     {
       key: "userId",
       dataIndex: "userId",
-      title: "User ID",
+      title: "User",
+      filters: userFilterItem(),
+      render: (id: number) => {
+        const name = users?.find((el) => el.id === id);
+        return <p>{name?.username}</p>;
+      },
+      onFilter: (value: any, record: any) => record.userId === value,
     },
     {
       key: "actions",
@@ -90,7 +107,7 @@ const MainContent = () => {
       <Table
         dataSource={posts}
         columns={headers}
-        loading={isLoading}
+        loading={isLoading && userLoading}
         rowKey="id"
       />
       <ManagePost ref={modalRef} />
