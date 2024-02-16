@@ -4,7 +4,7 @@ const Navbar = () => {
   return (
     <Header
       style={{
-        background: "#333",
+        background: "#444",
         color: "white",
         fontSize: "1.2rem",
       }}
